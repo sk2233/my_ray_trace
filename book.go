@@ -22,8 +22,9 @@ func TestBook() {
 	l := w / 2 / Tan(angle)
 	center := mgl32.Vec3{} // 相机位置
 	// 世界设置
-	world.Add(NewSphere(mgl32.Vec3{0, 0, 1000}, 200))
-	world.Add(NewSphere(mgl32.Vec3{0, 2200, 1000}, 2000))
+	world.Add(NewSphere(mgl32.Vec3{-200, 0, 1000}, 200, NewDielectric(1.5)))
+	world.Add(NewSphere(mgl32.Vec3{200, 0, 1000}, 200, NewMetal(mgl32.Vec3{0.8, 0.6, 0.2}, 0)))
+	world.Add(NewSphere(mgl32.Vec3{0, 2200, 1000}, 2000, NewLambert(mgl32.Vec3{0.8, 0.8, 0})))
 	// 进行渲染
 	img := image.NewRGBA(image.Rect(0, 0, int(w), int(h)))
 	for y := 0; y < int(h); y++ {
