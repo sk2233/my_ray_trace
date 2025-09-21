@@ -9,10 +9,15 @@ type ScatterDetail struct {
 
 type IMaterial interface {
 	Scatter(ray *Ray, detail *HitDetail) *ScatterDetail
+	Emitted(uv mgl32.Vec2, pos mgl32.Vec3) mgl32.Vec3
 }
 
 type Lambert struct {
 	Texture ITexture
+}
+
+func (l *Lambert) Emitted(uv mgl32.Vec2, pos mgl32.Vec3) mgl32.Vec3 {
+	return mgl32.Vec3{}
 }
 
 func NewSolidLambert(clr mgl32.Vec3) *Lambert {
@@ -37,12 +42,17 @@ func (l *Lambert) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
 	clr := l.Texture.Sample(detail.UV, detail.Point)
 	return &ScatterDetail{
 		Color: clr.Mul(scale),
+		//Ray:   ray,
 	}
 }
 
 type Metal struct {
 	Albedo mgl32.Vec3
 	Fuzz   float32
+}
+
+func (m *Metal) Emitted(uv mgl32.Vec2, pos mgl32.Vec3) mgl32.Vec3 {
+	return mgl32.Vec3{}
 }
 
 func NewMetal(albedo mgl32.Vec3, fuzz float32) *Metal {
@@ -65,6 +75,10 @@ func (m *Metal) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
 
 type Dielectric struct {
 	Refract float32 // 折射率
+}
+
+func (d *Dielectric) Emitted(uv mgl32.Vec2, pos mgl32.Vec3) mgl32.Vec3 {
+	return mgl32.Vec3{}
 }
 
 func (d *Dielectric) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
@@ -93,4 +107,24 @@ func (d *Dielectric) Reflectance(cos float32, refract float32) bool {
 
 func NewDielectric(refract float32) *Dielectric {
 	return &Dielectric{Refract: refract}
+}
+
+type DiffuseLight struct {
+	Texture ITexture
+}
+
+func (d *DiffuseLight) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
+	return nil
+}
+
+func (d *DiffuseLight) Emitted(uv mgl32.Vec2, pos mgl32.Vec3) mgl32.Vec3 {
+	return d.Texture.Sample(uv, pos)
+}
+
+func NewDiffuseLight(texture ITexture) *DiffuseLight {
+	return &DiffuseLight{Texture: texture}
+}
+
+func NewSolidLight(clr mgl32.Vec3) *DiffuseLight {
+	return &DiffuseLight{Texture: NewSolidColor(clr)}
 }

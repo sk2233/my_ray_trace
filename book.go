@@ -13,7 +13,8 @@ import (
 // https://raytracing.github.io/books/RayTracingTheNextWeek.html
 
 var (
-	world = NewHitList()
+	world      = NewHitList()
+	background = mgl32.Vec3{}
 )
 
 func TestBook() {
@@ -36,8 +37,10 @@ func TestBook() {
 			world.Add(NewSphere(mgl32.Vec3{x, 150, z}, 50, NewDielectric(1.5)))
 		} else if temp < 0.6 {
 			world.Add(NewSphere(mgl32.Vec3{x, 150, z}, 50, NewMetal(RandClr(), 0)))
-		} else {
+		} else if temp < 0.8 {
 			world.Add(NewSphere(mgl32.Vec3{x, 150, z}, 50, NewLambert(tempTexture)))
+		} else {
+			world.Add(NewSphere(mgl32.Vec3{x, 150, z}, 50, NewSolidLight(mgl32.Vec3{4, 4, 4})))
 		}
 	}
 	world.Add(NewSphere(mgl32.Vec3{-200, 0, 600}, 200, NewDielectric(1.5)))
@@ -77,15 +80,17 @@ func RayColor(ray *Ray, dep int) mgl32.Vec3 {
 	if dep >= MaxDep { // 防止无限递归
 		return mgl32.Vec3{}
 	}
-	if hit := world.Hit(ray); hit != nil { // 碰撞到物体
-		if scatter := hit.Material.Scatter(ray, hit); scatter != nil { // 进行散射
-			if scatter.Ray == nil { // 直接给颜色没有散射
-				return scatter.Color
-			}
-			return Mul(scatter.Color, RayColor(scatter.Ray, dep+1))
-		}
-		return mgl32.Vec3{} // 完全吸收光线
+	hit := world.Hit(ray)
+	if hit == nil { // 没有碰撞到返回背景
+		return background
 	}
-	rate := ray.Dir.Y() + 0.5
-	return MixVec(mgl32.Vec3{1, 1, 1}, mgl32.Vec3{0.5, 0.7, 1}, rate)
+	emitClr := hit.Material.Emitted(hit.UV, hit.Normal) // 发光色
+	scatter := hit.Material.Scatter(ray, hit)
+	if scatter == nil { // 不散射直接返回发光
+		return emitClr
+	}
+	if scatter.Ray == nil { // 直接给颜色没有散射
+		return scatter.Color.Add(emitClr)
+	}
+	return Mul(scatter.Color, RayColor(scatter.Ray, dep+1)).Add(emitClr)
 }
