@@ -27,6 +27,10 @@ func Tan(v float32) float32 {
 	return float32(math.Tan(float64(v)))
 }
 
+func Cos(v float32) float32 {
+	return float32(math.Cos(float64(v)))
+}
+
 func Pow(x float32, y float32) float32 {
 	return float32(math.Pow(float64(x), float64(y)))
 }
@@ -64,6 +68,14 @@ func GammaAdjust(v mgl32.Vec3) mgl32.Vec3 {
 	}
 }
 
+func RandClr() mgl32.Vec3 {
+	return mgl32.Vec3{
+		rand.Float32(),
+		rand.Float32(),
+		rand.Float32(),
+	}
+}
+
 func RandVec() mgl32.Vec3 {
 	res := mgl32.Vec3{
 		float32(rand.NormFloat64()),
@@ -83,4 +95,30 @@ func RandVecWithNormal(normal mgl32.Vec3) mgl32.Vec3 {
 		res = res.Mul(-1)
 	}
 	return res.Normalize()
+}
+
+func Acos(val float32) float32 {
+	return float32(math.Acos(float64(val)))
+}
+
+func Atan2(y, x float32) float32 {
+	return float32(math.Atan2(float64(y), float64(x)))
+}
+
+func GetSphereUV(normal mgl32.Vec3) mgl32.Vec2 {
+	th := Acos(-normal[1])
+	ph := Atan2(-normal[2], normal[0]) + math.Pi
+	return mgl32.Vec2{
+		ph / (2 * math.Pi),
+		th / math.Pi,
+	}
+}
+
+func LoadImage(path string) image.Image {
+	file, err := os.Open(path)
+	HandleErr(err)
+	defer file.Close()
+	img, err := png.Decode(file)
+	HandleErr(err)
+	return img
 }
