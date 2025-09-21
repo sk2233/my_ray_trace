@@ -28,6 +28,7 @@ func NewLambert(texture ITexture) *Lambert {
 	return &Lambert{Texture: texture}
 }
 
+// TODO  BUG 解决
 func (l *Lambert) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
 	//dir := detail.Normal.Add(RandVec()) // 随机散射与法线加权
 	//if dir.LenSqr() < MinOff {          // 太小了

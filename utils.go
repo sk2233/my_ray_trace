@@ -85,18 +85,6 @@ func RandVec() mgl32.Vec3 {
 	return res.Normalize()
 }
 
-func RandVecWithNormal(normal mgl32.Vec3) mgl32.Vec3 {
-	res := mgl32.Vec3{
-		float32(rand.NormFloat64()),
-		float32(rand.NormFloat64()),
-		float32(rand.NormFloat64()),
-	}
-	if normal.Dot(res) < 0 { // 调整为与 normal 同向
-		res = res.Mul(-1)
-	}
-	return res.Normalize()
-}
-
 func Acos(val float32) float32 {
 	return float32(math.Acos(float64(val)))
 }
