@@ -38,6 +38,7 @@ func TestBook() {
 	world.Add(NewQuad(mgl32.Vec3{-640, -360, 800 + 360}, mgl32.Vec3{0, 0, -720}, mgl32.Vec3{1280, 0, 0}, white))
 	world.Add(NewQuad(mgl32.Vec3{-640, -360, 800 + 360}, mgl32.Vec3{1280, 0, 0}, mgl32.Vec3{0, 720, 0}, white))
 	world.Add(NewQuad(mgl32.Vec3{-640, 360, 800 + 360}, mgl32.Vec3{1280, 0, 0}, mgl32.Vec3{0, 0, -720}, white))
+	// 两个倾斜方块
 	// 进行渲染
 	img := image.NewRGBA(image.Rect(0, 0, int(w), int(h)))
 	for y := 0; y < int(h); y++ {
