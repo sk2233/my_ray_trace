@@ -2,7 +2,6 @@ package main
 
 import (
 	"image"
-	"image/color"
 
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -44,7 +43,7 @@ func NewChessTexture(size float32, even ITexture, odd ITexture) *ChessTexture {
 }
 
 type ImageTexture struct {
-	Image         image.Image
+	Image         *image.RGBA
 	Width, Height float32
 }
 
@@ -54,7 +53,7 @@ func (i *ImageTexture) Sample(uv mgl32.Vec2, pos mgl32.Vec3) mgl32.Vec3 {
 	uv[1] = uv[1] - float32(int(uv[1]))
 	x := int(i.Width * uv[0])
 	y := int(i.Height * uv[1])
-	clr := i.Image.At(x, y).(color.RGBA)
+	clr := i.Image.RGBAAt(x, y)
 	return mgl32.Vec3{
 		float32(clr.R) / 255,
 		float32(clr.G) / 255,
@@ -62,7 +61,7 @@ func (i *ImageTexture) Sample(uv mgl32.Vec2, pos mgl32.Vec3) mgl32.Vec3 {
 	}
 }
 
-func NewImageTexture(image image.Image) *ImageTexture {
+func NewImageTexture(image *image.RGBA) *ImageTexture {
 	bound := image.Bounds()
 	return &ImageTexture{Image: image, Width: float32(bound.Dx()), Height: float32(bound.Dy())}
 }

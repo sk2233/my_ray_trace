@@ -2,6 +2,7 @@ package main
 
 import (
 	"image"
+	"image/draw"
 	"image/png"
 	"math"
 	"math/rand/v2"
@@ -128,13 +129,15 @@ func GetSphereUV(normal mgl32.Vec3) mgl32.Vec2 {
 	}
 }
 
-func LoadImage(path string) image.Image {
+func LoadImage(path string) *image.RGBA {
 	file, err := os.Open(path)
 	HandleErr(err)
 	defer file.Close()
 	img, err := png.Decode(file)
 	HandleErr(err)
-	return img
+	res := image.NewRGBA(img.Bounds())
+	draw.Draw(res, img.Bounds(), img, image.Point{}, draw.Src)
+	return res
 }
 
 // vs 盒子的8个顶点
