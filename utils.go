@@ -110,3 +110,23 @@ func LoadImage(path string) image.Image {
 	HandleErr(err)
 	return img
 }
+
+// vs 盒子的8个顶点
+func NewBox(size, pos, rotate mgl32.Vec3, material IMaterial) []*Quad {
+	scal := mgl32.Scale3D(size[0], size[1], size[2])
+	tran := mgl32.Translate3D(pos[0], pos[1], pos[2])
+	rota := mgl32.HomogRotate3DX(rotate[0]).Mul4(mgl32.HomogRotate3DY(rotate[1])).Mul4(mgl32.HomogRotate3DZ(rotate[2]))
+	mat := tran.Mul4(rota).Mul4(scal)
+	vs := []mgl32.Vec3{{0, 0, 1}, {1, 0, 1}, {1, 0, 0}, {0, 0, 0}, {0, 1, 1}, {1, 1, 1}, {1, 1, 0}, {0, 1, 0}}
+	for i := 0; i < len(vs); i++ {
+		vs[i] = mat.Mul4x1(vs[i].Vec4(1)).Vec3()
+	}
+	res := make([]*Quad, 0)
+	res = append(res, NewQuad(vs[3], vs[0].Sub(vs[3]), vs[2].Sub(vs[3]), material))
+	res = append(res, NewQuad(vs[3], vs[2].Sub(vs[3]), vs[7].Sub(vs[3]), material))
+	res = append(res, NewQuad(vs[3], vs[7].Sub(vs[3]), vs[0].Sub(vs[3]), material))
+	res = append(res, NewQuad(vs[5], vs[6].Sub(vs[5]), vs[1].Sub(vs[5]), material))
+	res = append(res, NewQuad(vs[5], vs[4].Sub(vs[5]), vs[6].Sub(vs[5]), material))
+	res = append(res, NewQuad(vs[5], vs[1].Sub(vs[5]), vs[4].Sub(vs[5]), material))
+	return res
+}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"math"
 	"math/rand/v2"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -32,6 +33,7 @@ func TestBook() {
 	white := NewSolidLambert(mgl32.Vec3{0.73, 0.73, 0.73})
 	green := NewSolidLambert(mgl32.Vec3{0.12, 0.45, 0.15})
 	light := NewSolidLight(mgl32.Vec3{15, 15, 15})
+	grey := NewSolidIsotropic(mgl32.Vec3{0.7, 0.7, 0.7})
 	world.Add(NewQuad(mgl32.Vec3{-640, -360, 800 + 360}, mgl32.Vec3{0, 720, 0}, mgl32.Vec3{0, 0, -720}, green))
 	world.Add(NewQuad(mgl32.Vec3{640, -360, 800 + 360}, mgl32.Vec3{0, 0, -720}, mgl32.Vec3{0, 720, 0}, red))
 	world.Add(NewQuad(mgl32.Vec3{-50, -360 + 10, 800 + 50}, mgl32.Vec3{0, 0, -100}, mgl32.Vec3{100, 0, 0}, light))
@@ -39,6 +41,11 @@ func TestBook() {
 	world.Add(NewQuad(mgl32.Vec3{-640, -360, 800 + 360}, mgl32.Vec3{1280, 0, 0}, mgl32.Vec3{0, 720, 0}, white))
 	world.Add(NewQuad(mgl32.Vec3{-640, 360, 800 + 360}, mgl32.Vec3{1280, 0, 0}, mgl32.Vec3{0, 0, -720}, white))
 	// 两个倾斜方块
+	quads := NewBox(mgl32.Vec3{200, 400, 200}, mgl32.Vec3{-420, -40, 800 - 100}, mgl32.Vec3{0, -math.Pi / 12, 0}, grey)
+	quads = append(quads, NewBox(mgl32.Vec3{200, 200, 200}, mgl32.Vec3{220, 160, 800 - 100}, mgl32.Vec3{0, math.Pi / 12, 0}, grey)...)
+	for _, quad := range quads {
+		world.Add(quad)
+	}
 	// 进行渲染
 	img := image.NewRGBA(image.Rect(0, 0, int(w), int(h)))
 	for y := 0; y < int(h); y++ {

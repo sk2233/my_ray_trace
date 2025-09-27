@@ -129,3 +129,28 @@ func NewDiffuseLight(texture ITexture) *DiffuseLight {
 func NewSolidLight(clr mgl32.Vec3) *DiffuseLight {
 	return &DiffuseLight{Texture: NewSolidColor(clr)}
 }
+
+type Isotropic struct {
+	Texture ITexture
+}
+
+func NewIsotropic(texture ITexture) *Isotropic {
+	return &Isotropic{Texture: texture}
+}
+
+func NewSolidIsotropic(clr mgl32.Vec3) *Isotropic {
+	return &Isotropic{Texture: NewSolidColor(clr)}
+}
+
+func (i *Isotropic) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
+	// 散射方向是随机的
+	ray = NewRay(detail.Point, RandVec(), ray.Rate)
+	return &ScatterDetail{
+		Ray:   ray,
+		Color: i.Texture.Sample(detail.UV, detail.Point),
+	}
+}
+
+func (i *Isotropic) Emitted(uv mgl32.Vec2, pos mgl32.Vec3) mgl32.Vec3 {
+	return mgl32.Vec3{}
+}
