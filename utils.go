@@ -92,7 +92,7 @@ func RandUnitVec() mgl32.Vec3 {
 	for {
 		p := RandVec(-1, 1)
 		l := p.Len()
-		if l > MinOff && l <= 1.0 {
+		if l > 1e-80 && l <= 1.0 {
 			return p.Mul(1 / l)
 		}
 	}
@@ -107,7 +107,7 @@ func RandUnitVecWithNormal(normal mgl32.Vec3) mgl32.Vec3 {
 }
 
 func NearZero(v mgl32.Vec3) bool {
-	m := float32(0.0000_0001)
+	m := float32(1e-8)
 	return mgl32.Abs(v[0]) < m && mgl32.Abs(v[1]) < m && mgl32.Abs(v[2]) < m
 }
 

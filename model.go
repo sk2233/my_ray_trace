@@ -43,11 +43,11 @@ func (s *Sphere) Hit(ray *Ray) *HitDetail {
 		return nil
 	}
 	thc := Sqrt(s.Radius*s.Radius - d2)
-	rate := tca - thc   // 优先选择最近的
-	if rate <= MinOff { // 射线的反向，尝试另一个交点
+	rate := tca - thc  // 优先选择最近的
+	if rate <= 0.001 { // 射线的反向，尝试另一个交点
 		rate = tca + thc
 	}
-	if rate <= MinOff { // 仍然反向，没有交点
+	if rate <= 0.001 { // 仍然反向，没有交点
 		return nil
 	}
 	point := ray.At(rate)
