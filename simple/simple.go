@@ -28,7 +28,7 @@ func TestSimple() {
 	spheres = append(spheres, &Sphere{mgl32.Vec3{0.0, 20, -30}, 3, mgl32.Vec3{},
 		mgl32.Vec3{3, 3, 3}, 0, false})
 	img := Render(spheres, 1280, 720)
-	SaveImage(img, "output/spheres.png")
+	SaveImage(img, "output/simple.png")
 }
 
 func Render(spheres []*Sphere, w float32, h float32) *image.RGBA {

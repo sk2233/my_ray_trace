@@ -1,5 +1,7 @@
 package main
 
+import "my_ray_trace/simple"
+
 func main() {
-	TestBook()
+	simple.TestSimple()
 }
