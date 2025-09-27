@@ -28,7 +28,7 @@ func TestBook() {
 	rotate := mgl32.HomogRotate3DX(mgl32.DegToRad(0)).
 		Mul4(mgl32.HomogRotate3DY(mgl32.DegToRad(0))) // 相机旋转 x y 是反的
 	// 世界设置
-	background = mgl32.Vec3{0.5, 0.7, 1.0}
+	background = mgl32.Vec3{0.7, 0.8, 1}
 	// 设置地面
 	chess := NewChessTexture(10, NewSolidColor(mgl32.Vec3{0.2, 0.3, 0.1}), NewSolidColor(mgl32.Vec3{0.9, 0.9, 0.9}))
 	world.Add(NewSphere(mgl32.Vec3{0, 10000, 600}, 10000, NewLambert(chess)))
@@ -39,7 +39,7 @@ func TestBook() {
 			pos := mgl32.Vec3{float32(i)*60 + 20*rand.Float32(), -20, 600 + float32(j)*60 + 20*rand.Float32()}
 			temp := rand.Float32()
 			if temp < 0.8 {
-				world.Add(NewSphere(pos, 20, NewLambert(tex)))
+				world.Add(NewSphere(pos, 20, NewSolidLambert(RandClr())))
 			} else if temp < 0.95 {
 				world.Add(NewSphere(pos, 20, NewMetal(RandVec(0.5, 1), Rand(0, 0.5))))
 			} else {
@@ -48,7 +48,7 @@ func TestBook() {
 		}
 	}
 	world.Add(NewSphere(mgl32.Vec3{0, -100, 600}, 100, NewDielectric(1.5)))
-	world.Add(NewSphere(mgl32.Vec3{-200, -100, 600}, 100, NewSolidLambert(mgl32.Vec3{0.4, 0.2, 0.1})))
+	world.Add(NewSphere(mgl32.Vec3{-200, -100, 600}, 100, NewLambert(tex)))
 	world.Add(NewSphere(mgl32.Vec3{200, -100, 600}, 100, NewMetal(mgl32.Vec3{0.7, 0.6, 0.5}, 0)))
 	// 进行渲染
 	img := image.NewRGBA(image.Rect(0, 0, int(w), int(h)))
