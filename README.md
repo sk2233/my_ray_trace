@@ -10,4 +10,5 @@
 > 
 > 参考：https://raytracing.github.io/books/RayTracingInOneWeekend.html
 #### 复杂模式2
-TODO
+![book2.png](output/book2.png)
+> 分支：
