@@ -15,7 +15,7 @@ import (
 var (
 	world       = NewHitList()
 	background  = mgl32.Vec3{}
-	sampleCount = float32(1)
+	sampleCount = float32(100) // 增加采样次数以减少噪点
 )
 
 func TestBook() {
@@ -50,46 +50,41 @@ func TestBook() {
 	world.Add(NewSphere(mgl32.Vec3{200, -100, 600}, 100, NewMetal(mgl32.Vec3{0.7, 0.6, 0.5}, 0)))
 	// 进行渲染
 	img := image.NewRGBA(image.Rect(0, 0, int(w), int(h)))
+	total := int(w) * int(h)
+	processed := 0
+
 	for y := 0; y < int(h); y++ {
-		fmt.Println("new line", y)
 		for x := 0; x < int(w); x++ {
-			if x == 630 && y == 254 {
-				fmt.Println("AAA")
-			}
 			clr := mgl32.Vec3{}
-			if sampleCount > 1 { // 进行多次采样
-				for i := 0; i < int(sampleCount); i++ {
-					tx := float32(x) + rand.Float32() - 0.5
-					ty := float32(y) + rand.Float32() - 0.5
-					// 计算视口点的位置 坐标系并没有正规化
-					vp := mgl32.Vec3{tx - w/2 + 0.5, ty - h/2 + 0.5, l}.Normalize()
-					vp = rotate.Mat3().Mul3x1(vp) // 应用旋转，射线平移体现在相机位置上，射线方向不包含位置
-					pos := rotate.Mul4x1(center.Vec4(1)).Vec3()
-					ray := NewRay(pos, vp, rand.Float32())
-					clr = clr.Add(RayColor(ray, 0))
-				}
-				clr = clr.Mul(1 / sampleCount)
-			} else {
+			// 进行多次采样以减少噪点
+			for i := 0; i < int(sampleCount); i++ {
+				// 在像素内随机采样
+				tx := float32(x) + rand.Float32() - 0.5
+				ty := float32(y) + rand.Float32() - 0.5
 				// 计算视口点的位置 坐标系并没有正规化
-				vp := mgl32.Vec3{float32(x) - w/2 + 0.5, float32(y) - h/2 + 0.5, l}.Normalize()
+				vp := mgl32.Vec3{tx - w/2 + 0.5, ty - h/2 + 0.5, l}.Normalize()
 				vp = rotate.Mat3().Mul3x1(vp) // 应用旋转，射线平移体现在相机位置上，射线方向不包含位置
 				pos := rotate.Mul4x1(center.Vec4(1)).Vec3()
 				ray := NewRay(pos, vp, rand.Float32())
-				clr = RayColor(ray, 0)
+				clr = clr.Add(RayColor(ray, 0))
 			}
-			if NearZero(clr) {
-				fmt.Println("clr is near zero")
-			}
-			clr = GammaAdjust(clr) // gamma 矫正， 入参范围  0 ~ 1
+			clr = clr.Mul(1 / sampleCount) // 平均化采样结果
+			clr = GammaAdjust(clr)         // gamma 矫正， 入参范围  0 ~ 1
 			img.Set(x, y, color.RGBA{
 				R: uint8(min(clr[0]*255, 255)),
 				G: uint8(min(clr[1]*255, 255)),
 				B: uint8(min(clr[2]*255, 255)),
 				A: 255,
 			})
+
+			// 每处理1000个像素显示一次进度
+			processed++
+			if processed%1000 == 0 {
+				progress := float64(processed) / float64(total) * 100
+				fmt.Printf("渲染进度: %.1f%% (%d/%d)\n", progress, processed, total)
+			}
 		}
 	}
-	fmt.Println("all over")
 	SaveImage(img, "output/book.png")
 }
 
