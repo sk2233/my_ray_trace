@@ -32,14 +32,14 @@ func TestBook() {
 	// 设置地面
 	chess := NewChessTexture(10, NewSolidColor(mgl32.Vec3{0.2, 0.3, 0.1}), NewSolidColor(mgl32.Vec3{0.9, 0.9, 0.9}))
 	world.Add(NewSphere(mgl32.Vec3{0, 10000, 600}, 10000, NewLambert(chess)))
+	tex := NewImageTexture(LoadImage("res/test2.png"))
 	// 设置其他场景
 	for i := -8; i < 8; i++ {
 		for j := -5; j < 5; j++ {
 			pos := mgl32.Vec3{float32(i)*60 + 20*rand.Float32(), -20, 600 + float32(j)*60 + 20*rand.Float32()}
 			temp := rand.Float32()
 			if temp < 0.8 {
-				pos2 := pos.Add(mgl32.Vec3{0, -rand.Float32() * 40, 0})
-				world.Add(NewMoveSphere(pos, pos2, 20, NewSolidLambert(RandClr())))
+				world.Add(NewSphere(pos, 20, NewLambert(tex)))
 			} else if temp < 0.95 {
 				world.Add(NewSphere(pos, 20, NewMetal(RandVec(0.5, 1), Rand(0, 0.5))))
 			} else {
