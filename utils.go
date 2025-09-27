@@ -76,13 +76,39 @@ func RandClr() mgl32.Vec3 {
 	}
 }
 
-func RandVec() mgl32.Vec3 {
-	res := mgl32.Vec3{
-		float32(rand.NormFloat64()),
-		float32(rand.NormFloat64()),
-		float32(rand.NormFloat64()),
+func Rand(min, max float32) float32 {
+	return min + rand.Float32()*(max-min)
+}
+
+func RandVec(min, max float32) mgl32.Vec3 {
+	return mgl32.Vec3{
+		Rand(min, max),
+		Rand(min, max),
+		Rand(min, max),
 	}
-	return res.Normalize()
+}
+
+func RandUnitVec() mgl32.Vec3 {
+	for {
+		p := RandVec(-1, 1)
+		l := p.Len()
+		if l > MinOff && l <= 1.0 {
+			return p.Mul(1 / l)
+		}
+	}
+}
+
+func RandUnitVecWithNormal(normal mgl32.Vec3) mgl32.Vec3 {
+	res := RandUnitVec()
+	if res.Dot(normal) > 0 {
+		return res
+	}
+	return res.Mul(-1)
+}
+
+func NearZero(v mgl32.Vec3) bool {
+	m := float32(0.0000_0001)
+	return mgl32.Abs(v[0]) < m && mgl32.Abs(v[1]) < m && mgl32.Abs(v[2]) < m
 }
 
 func Acos(val float32) float32 {

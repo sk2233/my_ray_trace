@@ -1,6 +1,10 @@
 package main
 
-import "github.com/go-gl/mathgl/mgl32"
+import (
+	"math/rand/v2"
+
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type ScatterDetail struct {
 	Ray   *Ray
@@ -28,22 +32,18 @@ func NewLambert(texture ITexture) *Lambert {
 	return &Lambert{Texture: texture}
 }
 
-// TODO  BUG 解决
 func (l *Lambert) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
-	//dir := detail.Normal.Add(RandVec()) // 随机散射与法线加权
-	//if dir.LenSqr() < MinOff {          // 太小了
-	//	dir = detail.Normal
-	//} else {
-	//	dir = dir.Normalize()
-	//}
-	//ray = NewRay(detail.Point, dir, ray.Rate)
-	//scale := max(dir.Dot(detail.Normal), 0)
-	// 直接使用光栅图形了
-	scale := ray.Dir.Mul(-1).Dot(detail.Normal)
+	dir := detail.Normal.Add(RandUnitVec()) // 随机散射与法线加权
+	if NearZero(dir) {                      // 太小了
+		dir = detail.Normal
+	} else {
+		dir = dir.Normalize()
+	}
+	ray = NewRay(detail.Point, dir, ray.Rate)
 	clr := l.Texture.Sample(detail.UV, detail.Point)
 	return &ScatterDetail{
-		Color: clr.Mul(scale),
-		//Ray:   ray,
+		Color: clr,
+		Ray:   ray,
 	}
 }
 
@@ -63,7 +63,7 @@ func NewMetal(albedo mgl32.Vec3, fuzz float32) *Metal {
 func (m *Metal) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
 	ray = ray.Reflect(detail.Point, detail.Normal)
 	if m.Fuzz > 0 {
-		ray.Dir = ray.Dir.Add(RandVec().Mul(m.Fuzz)).Normalize()
+		ray.Dir = ray.Dir.Add(RandUnitVec().Mul(m.Fuzz)).Normalize()
 	}
 	if ray.Dir.Dot(detail.Normal) <= 0 {
 		return nil
@@ -103,7 +103,7 @@ func (d *Dielectric) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
 func (d *Dielectric) Reflectance(cos float32, refract float32) bool {
 	r0 := (1 - refract) / (1 + refract) // 近似玻璃极端角度的镜面反射
 	r0 = r0 * r0
-	return r0+(1-r0)*Pow(1-cos, 5) > 0.5
+	return r0+(1-r0)*Pow(1-cos, 5) > rand.Float32()
 }
 
 func NewDielectric(refract float32) *Dielectric {
@@ -144,7 +144,7 @@ func NewSolidIsotropic(clr mgl32.Vec3) *Isotropic {
 
 func (i *Isotropic) Scatter(ray *Ray, detail *HitDetail) *ScatterDetail {
 	// 散射方向是随机的
-	ray = NewRay(detail.Point, RandVec(), ray.Rate)
+	ray = NewRay(detail.Point, RandUnitVec(), ray.Rate)
 	return &ScatterDetail{
 		Ray:   ray,
 		Color: i.Texture.Sample(detail.UV, detail.Point),
