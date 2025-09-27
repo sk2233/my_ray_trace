@@ -53,6 +53,9 @@ func TestBook() {
 	for y := 0; y < int(h); y++ {
 		fmt.Println("new line", y)
 		for x := 0; x < int(w); x++ {
+			if x == 630 && y == 254 {
+				fmt.Println("AAA")
+			}
 			clr := mgl32.Vec3{}
 			if sampleCount > 1 { // 进行多次采样
 				for i := 0; i < int(sampleCount); i++ {
@@ -73,6 +76,9 @@ func TestBook() {
 				pos := rotate.Mul4x1(center.Vec4(1)).Vec3()
 				ray := NewRay(pos, vp, rand.Float32())
 				clr = RayColor(ray, 0)
+			}
+			if NearZero(clr) {
+				fmt.Println("clr is near zero")
 			}
 			clr = GammaAdjust(clr) // gamma 矫正， 入参范围  0 ~ 1
 			img.Set(x, y, color.RGBA{
